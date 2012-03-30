@@ -1,61 +1,100 @@
-% A script to produce approximate the minimum of a quadratic (zero-offset) function F(x) = q'x + 1/2 x'Kx given a set of constraints Ax = b (where n > m) and x >= 0
+% A script to produce approximate the minimum of a quadratic (zero-offset) function
+% F(x) = q'x + 1/2 x'Kx given a set of constraints Dx-e=0 (Rp) and Cx-b >= 0 (Rm)
 
-% the specific values are from an example from Strang's textbook
+%%%% PARAMETER DECLARATIONS
+% Strang LP Example (~30 iterations for convergence)
+% function to minimize
+% q = [5;3;8];
+% K = zeros(3,3);
 
-% parts of function to minimize
+% constraints
+% C = [1 0 0;0 1 0;0 0 1]; b = [0 0 0]';
+% D = [1 1 2]; e = [4];
+
+% w = 4/3; % iniitial barrier weight barrier weight
+% wm = 4/3*1/64; % (w minimum) w at which the program will terminate
+% wup = 1e-2; % (w update) ratio of dx/x, dy/y or dL/L at which w will be shrunk
+% ov = 0.2; % tolerated fractional overshoot
+% x = [1 1 1]'; y = [1 1 1]'; L = [0.5]; % initial point
+
+% Mattingley QP Example
+% function to minimize
 q = [5;3;8];
 K = zeros(3,3);
 
 % constraints
-A = [1 1 2];
-b = [4];
+C = [1 0 0;0 1 0;0 0 1]; b = [0 0 0]';
+D = [1 1 2]; e = [4];
 
-% relevant dimensions
+w = 4/3; % iniitial barrier weight barrier weight
+wm = 4/3*1/64; % (w minimum) w at which the program will terminate
+wup = 1e-2; % (w update) ratio of dx/x, dy/y or dL/L at which w will be shrunk
+ov = 0.2; % tolerated fractional overshoot
+x = [1 1 1]'; y = [1 1 1]'; L = [0.5]; % initial point
+
+%%%% END PARAMETER DECLARATIONS
+
+%%% DIMENSIONS
 n = size(K, 1);
-m = size(A, 1);
+m = size(C, 1);
+p = size(D, 1);
 
-% barrier weight
-theta = 1e-3;
-theta_lower_bound = 0.01;
+%%% DISPLACEMENT VECTORS
+dx = x; dy = y; dL = L;
 
-% starting point
-x = ones(3,1); % iterative x variable
-y = 2; % iterative lagrange multiplier
+%%% AUXILIARY VECTORS & MATRICES
+s = zeros(m,1); % Cx-b 
+S = zeros(m,m); % diagonalized s
+O = ones(m,1); % ones vector for the w
+Y = zeros(m,m); % diagonalized y
 
-% auxiliary vectors and matrices
-dx = x; % displacement in x
-dy = y; % displacement in y
-s = zeros(n,1);
+Zpm = zeros(p,m); % statis zero matrices
+Zpp = zeros(p,p);
+Zmp = zeros(m,p);
 
-Z = zeros(m,m);
-r = zeros(n+m,1);
-d = zeros(n+m,1); % displacement vector
-O = ones(n,1); % ones vector
-Th = zeros(n,1); % theta scalar vector
-B = zeros(n+m,n+m); % big KKT matric
-
-% diagonalized matrices
-S = zeros(n, n);
-X = zeros(n, n);
-
-N = 100; % number of iterations
+%%% LOOP
 I = 0; % number of iterations
-while max(dx)/max(x) > 1e-3
-	Th = theta*O;
-	s = q-Th./x;
+while w > wm
+	s = C*x-b;
 	S = diag(s);
-   	X = diag(x);
-	r = [Th-(S*X*O); zeros(m, 1)];
-	B = [(S+X*K) (-X*A');A Z];
-	d = B\r;
+	W = w*O;
+	Y = diag(y);
+
+	% assemble system
+	B = [D Zpm Zpp;Y*C S Zmp;K -C' -D'];
+	v = [e-D*x;W-Y*s;C'*y+D'*L-q-K*x];
+
+	% solve
+	d = B\v;
 	dx = d(1:n);
 	dy = d(n+1:n+m);
+	dL = d(n+m+1:n+m+p);
+
+	% check for overshoot / tentative
+	px = max(dx./x);
+	py = max(dy./y);
+	pL = max(dL./L);
+	pm = max([px, py, pL]);
+	if pm > ov
+		a = ov/pm;
+		dx = a*dx;
+		dy = a*dy;
+		dL = a*dL;
+	end
+
+	% update
 	x = x+dx;
 	y = y+dy;
-	theta = theta;
+	L = L+dL;
 	I = I+1;
+
+	% occasionally shrink factor
+	if pm < wup 
+		w = w/2;
+	end
 end
 
 x
 y
+L
 I
