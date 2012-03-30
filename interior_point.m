@@ -4,21 +4,6 @@
 %%%% PARAMETER DECLARATIONS
 % Strang LP Example (~30 iterations for convergence)
 % function to minimize
-% q = [5;3;8];
-% K = zeros(3,3);
-
-% constraints
-% C = [1 0 0;0 1 0;0 0 1]; b = [0 0 0]';
-% D = [1 1 2]; e = [4];
-
-% w = 4/3; % iniitial barrier weight barrier weight
-% wm = 4/3*1/64; % (w minimum) w at which the program will terminate
-% wup = 1e-2; % (w update) ratio of dx/x, dy/y or dL/L at which w will be shrunk
-% ov = 0.2; % tolerated fractional overshoot
-% x = [1 1 1]'; y = [1 1 1]'; L = [0.5]; % initial point
-
-% Mattingley QP Example
-% function to minimize
 q = [5;3;8];
 K = zeros(3,3);
 
@@ -31,6 +16,10 @@ wm = 4/3*1/64; % (w minimum) w at which the program will terminate
 wup = 1e-2; % (w update) ratio of dx/x, dy/y or dL/L at which w will be shrunk
 ov = 0.2; % tolerated fractional overshoot
 x = [1 1 1]'; y = [1 1 1]'; L = [0.5]; % initial point
+
+% Mattingley QP Example
+% function to minimize
+% constraints
 
 %%%% END PARAMETER DECLARATIONS
 
@@ -48,7 +37,7 @@ S = zeros(m,m); % diagonalized s
 O = ones(m,1); % ones vector for the w
 Y = zeros(m,m); % diagonalized y
 
-Zpm = zeros(p,m); % statis zero matrices
+Zpm = zeros(p,m); % static zero matrices
 Zpp = zeros(p,p);
 Zmp = zeros(m,p);
 
