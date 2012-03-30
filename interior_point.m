@@ -11,7 +11,7 @@ K = zeros(3,3);
 C = [1 0 0;0 1 0;0 0 1]; b = [0 0 0]';
 D = [1 1 2]; e = [4];
 
-w = 4/3; % iniitial barrier weight barrier weight
+w = 4/3; % initial barrier weight
 wm = 4/3*1/64; % (w minimum) w at which the program will terminate
 wup = 1e-2; % (w update) ratio of dx/x, dy/y or dL/L at which w will be shrunk
 ov = 0.2; % tolerated fractional overshoot
