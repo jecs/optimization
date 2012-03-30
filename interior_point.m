@@ -1,4 +1,4 @@
-% A script to produce approximate the minimum of a quadratic (zero-offset) function
+% A script that approximates the minimum of a quadratic (zero-offset) function
 % F(x) = q'x + 1/2 x'Kx given a set of constraints Dx-e=0 (Rp) and Cx-b >= 0 (Rm)
 
 %%%% PARAMETER DECLARATIONS
