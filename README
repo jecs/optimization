@@ -1,1 +1,8 @@
+qpopt - A primal-dual interior-point method for QCQP problems
+
+This algorithm adapted from Convex Optimization by Boyd and Vandenberghe.
+
+
+Author: Jose E. Cruz Serralles
+
 
