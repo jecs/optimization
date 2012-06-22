@@ -1,0 +1,7 @@
+Rough CUDA implementation of IP optimization algorithm
+
+Compile:
+nvcc -arch=sm_21 --machine 64 --use_fast_math -O3 -o ipqopt_kernelized.o ipqopt_kernelized.cu
+
+Profile:
+nvvp
